@@ -37,6 +37,7 @@ jobs:
 
               for (const reaction of reactions) {
                 const user = reaction.user.login;
+                console.log(`Found reaction ${reaction.content} by ${user}`);
                 if (reaction.content !== "eyes") continue;
 
                 // Check if the user is an org member
