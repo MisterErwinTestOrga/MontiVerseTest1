@@ -10,6 +10,7 @@ jobs:
       pull-requests: write
       issues: write
     steps:
+      - run: echo "sha ${{ github.event.pull_request.head.sha }}"
       - name: Find last Comment on PR
         uses: peter-evans/find-comment@v3
         if: ${{ github.event.pull_request.number }}
