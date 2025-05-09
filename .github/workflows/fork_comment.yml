@@ -57,6 +57,7 @@ jobs:
                   });
                   break;
                 } catch (e) {
+                  console.log(e);
                   // Not a member
                 }
               }
