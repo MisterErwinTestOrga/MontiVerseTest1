@@ -40,7 +40,7 @@ jobs:
                 // Check if the user is an org member
                 try {
                   await github.rest.orgs.checkMembershipForUser({
-                    'MisterErwinTestOrga',
+                    org: 'MisterErwinTestOrga',
                     username: user
                   });
 
