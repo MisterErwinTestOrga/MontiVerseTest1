@@ -1,0 +1,25 @@
+name: On Fork
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+jobs:
+  check-fork:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name != github.repository
+    steps:
+      - name: Find last Comment on PR
+        uses: peter-evans/find-comment@v3
+        if: ${{ github.event.pull_request.number }}
+        id: fc
+        with:
+          issue-number: ${{  github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: MontiVerse
+      - name: Create or update PR comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{  github.event.pull_request.number }}
+          body: "MontiVerse was not triggered by this change because it came from an external repository. React with :eyes: to trigger the MontiVerse."
+          edit-mode: replace
+          reactions: eyes
