@@ -1,0 +1,64 @@
+name: Check Reactions from Org Members
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # every 10 minutes
+  workflow_dispatch:
+
+jobs:
+  check-reactions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get recent PR comments
+        id: get-comments
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const tenMinutesAgo = new Date(new Date().getTime() - 10 * 60 * 1000); 
+            const { data: comments } = await github.rest.issues.listCommentsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sort: 'updated',
+              direction: 'desc',
+              since: tenMinutesAgo.toISOString()
+            });
+
+            let found = false;
+
+            for (const comment of comments) {
+              const { data: reactions } = await github.rest.reactions.listForIssueComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: comment.id
+              });
+
+              for (const reaction of reactions) {
+                const user = reaction.user.login;
+                if (reaction.content !== "eyes") continue;
+
+                // Check if the user is an org member
+                try {
+                  await github.rest.orgs.checkMembershipForUser({
+                    'MisterErwinTestOrga',
+                    username: user
+                  });
+
+                  found = true;
+                  console.log(`Org member ${user} reacted to comment ${comment.id}`);
+                  await github.rest.reactions.deleteForIssueComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    comment_id: comment.id,
+                    reaction_id: reaction.id
+                  });
+                  break;
+                } catch (e) {
+                  // Not a member
+                }
+              }
+
+              if (found) break;
+            }
+
+            core.setOutput("reaction_found", found);
