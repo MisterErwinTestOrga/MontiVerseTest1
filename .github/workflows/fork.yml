@@ -8,6 +8,7 @@ jobs:
     if: github.event.pull_request.head.repo.full_name != github.repository
     permissions:
       pull-requests: write
+      issues: write
     steps:
       - name: Find last Comment on PR
         uses: peter-evans/find-comment@v3
