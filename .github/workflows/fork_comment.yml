@@ -32,6 +32,8 @@ jobs:
                 repo: context.repo.repo,
                 comment_id: comment.id
               });
+              console.log(`Found comment by ${comment.user.login}`);
+              console.log(comment.body);
 
               for (const reaction of reactions) {
                 const user = reaction.user.login;
